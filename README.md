@@ -16,5 +16,5 @@ Kilo does not depend on any library (not even curses). It uses fairly standard V
 
 People are encouraged to use it as a starting point to write other editors or command line interfaces that are more advanced than the usual REPL style CLI.
 
-Kilo was written by _Salvatore Sanfilippo_ aka antirez and is released under the BSD 2 clause license.
+Kilo was written by _Salvatore Sanfilippo_ aka antirez and is released under the BSD 2 clause license.  
 The tutorial is available here: http://viewsourcecode.org/snaptoken/kilo
