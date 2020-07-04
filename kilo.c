@@ -6,6 +6,9 @@
 #include <termios.h>
     // Standard Library
 #include <stdlib.h>
+    //Used to show what we are typing
+#include <ctype.h>
+#include <stdio.h>
 
 struct termios orig_termios;
 
@@ -19,6 +22,8 @@ void enableRawMode() {
   atexit(disableRawMode);
   struct termios raw = orig_termios;
       // This code disables canonical mode
+      // ISIG disables signals SIGINT (Ctrl + c) & SIGTSTP (Ctrl + z)
+          // So we disable them both too
   raw.c_lflag &= ~(ECHO | ICANON);
       // Method to read attributes into termios
   // ----------
@@ -43,7 +48,25 @@ int main() {
         // To make it stop -> Ctrl + D
   //while (read(STDIN_FILENO, &c, 1) == 1);
       //The same as above, but will stop to read when we put a q and press Enter.
-  while (read(STDIN_FILENO, &c, 1) == 1 && c != 'q');
-
+  while (read(STDIN_FILENO, &c, 1) == 1 && c != 'q') {
+        // iscntrl() tests whether a character is a control character. +
+        // Control characters are nonprintable characters that we don’t want to print to the screen
+    if(iscntrl(c)) {
+        // printf() can print multiple representations of a byte
+        // %d tells it to format the byte as a decimal number (its ASCII code)
+      printf("%d\n", c);
+            // We can see how each key is represented
+            // $: 97 ('a')
+            // $: 98 ('b')
+            // $: 99 ('c')
+            // $: 100 ('d')
+                // Special characters have other representations
+                // Ctrl + a = 1
+                // Ctrl + b = 2
+    } else {
+        // %c tells it to write out the byte directly, as a character.
+      printf("%d ('%c')\n", c, c);
+    }
+  }
   return 0;
 }
