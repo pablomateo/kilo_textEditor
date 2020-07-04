@@ -4,15 +4,34 @@
 #include <unistd.h>
     // We need to include it because other methods come from it.
 #include <termios.h>
+    // Standard Library
+#include <stdlib.h>
+
+struct termios orig_termios;
+
+void disableRawMode() {
+  tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
+}
 
 void enableRawMode() {
-  struct termios raw;
-  tcgetattr(STDIN_FILENO, &raw);
+  tcgetattr(STDIN_FILENO, &orig_termios);
+      // We go back to Canonical mode
+  atexit(disableRawMode);
+  struct termios raw = orig_termios;
+      // This code disables canonical mode
+  raw.c_lflag &= ~(ECHO | ICANON);
+      // Method to read attributes into termios
+  // ----------
+  //tcgetattr(STDIN_FILENO, &raw);
       // Canonical mode = you see in terminal what you ype.
       // Raw mode = You don't see it
       // So, in this line, we turn off echoing
         // If after closing the program it doen't go back to canonical mode, type: reset (ENTER)
+            // But we reset Terminal to its former state with method disableRawMode()
+      // ECHO es a bitflag ===================================>    00000000000000000000000000001000
+      // We use the bitwise NOT operator (~) to turn it into =>    11111111111111111111111111110111
   raw.c_lflag &= ~(ECHO);
+      // Method to apply them to Terminal
   tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
 
