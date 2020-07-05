@@ -11,12 +11,19 @@
 #include <stdio.h>
 #include <errno.h>
 
+/*** defines ***/
+// Whatever key goes with Ctrl gets ignored
+#define CTRL_KEY(k) ((k) & 0x1f)
+
+
 /*** data ***/
 struct termios orig_termios;
 
 /*** terminal ***/
   // We will call this functioon when we have an error, to close the program.
 void die(const char *s) {
+  write(STDOUT_FILENO, "\x1b[2J", 4);
+  write(STDOUT_FILENO, "\x1b[H", 3);
   perror(s);
   exit(1);
 }
@@ -70,10 +77,67 @@ void enableRawMode() {
   if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) die("tcsetattr");
 }
 
+  // Waits for keypress and returns it
+char editoReadKey() {
+  int nread;
+  char c;
+  while((nread = read(STDIN_FILENO, &c, 1)) != 1) {
+    if(nread == -1 && errno != EAGAIN) die("read");
+  }
+  return c;
+}
+
+/*** input ***/
+  // Waits for key press and handles it.
+void editorProcessKeyPress() {
+  char c = editoReadKey();
+  switch(c) {
+    case CTRL_KEY('q'):
+      write(STDOUT_FILENO, "\x1b[2J", 4);
+      write(STDOUT_FILENO, "\x1b[H", 3);
+      exit(0);
+      break;
+  }
+}
+
+/*** output ***/
+// we are going to draw tildes on the side, like Vim does.
+void editorDrawRows() {
+int y;
+for(y = 0; y <24; y++) {
+  write(STDOUT_FILENO, "~\r\n", 3);
+}
+}
+
+void editorRefreshScreen() {
+    // We are writing 4 bytes out to the terminal
+      // First => \x1b (escape character) (27 in decimal)
+      // Second => [2J
+      // Escape character + [ => escape sequence
+        // J => Clear the screen
+        // 2 => Full screen
+          // <esc>[1J will clear the screen up to the cursor
+          // <esc>[0J will clear the screen from the cursor to the end...
+  write(STDOUT_FILENO, "\x1b[2J", 4);
+    // Reposition the cursor
+      // H => Cursor position
+  write(STDOUT_FILENO, "\x1b[H", 3);
+  editorDrawRows();
+  write(STDOUT_FILENO, "\x1b[H", 3);
+}
+
+
 /*** init ***/
 int main() {
   enableRawMode();
 
+  while(1) {
+    editorRefreshScreen();
+    editorProcessKeyPress();
+  }
+  return 0;
+
+/*
   while (1) {
     // We create a character
     char c = '\0';
@@ -102,8 +166,9 @@ int main() {
         // %c tells it to write out the byte directly, as a character.
         printf("%d ('%c')\r\n", c, c);
     }
-    if (c == 'q') break;
-    return 0;
+    if (c == CTRL_KEY('q')) break;
   }
+  return 0;
+*/
 
 }
