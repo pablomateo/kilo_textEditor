@@ -17,19 +17,29 @@
 #include <stdarg.h>
 #include <fcntl.h>
 
-
 /*** defines ***/
 // Whatever key goes with Ctrl gets ignored
-#define CTRL_KEY(k) ((k) & 0x1f)
-#define KILO_VERSION "1.0.0"
-#define KILO_TAB_STOP 8
 #define _DEFAULT_SOURCE
 #define _BSD_SOURCE
 #define _GNU_SOURCE
+#define CTRL_KEY(k) ((k) & 0x1f)
+#define KILO_VERSION "1.0.0"
+#define KILO_TAB_STOP 8
+#define KILO_QUIT_TIMES 3
 #define HL_HIGHLIGHT_NUMBERS (1<<0)
 #define HL_HIGHLIGHT_STRINGS (1<<1)
 #define HLDB_ENTRIES (sizeof(HLDB) / sizeof(HLDB[0]))
 #define ABUF_INIT {NULL, 0}
+
+/*** filetypes ***/
+char *C_HL_extensions[] = { ".c", ".h", ".cpp", NULL };
+char *C_HL_keywords[] = {
+  "switch", "if", "while", "for", "break", "continue", "return", "else",
+  "struct", "union", "typedef", "static", "enum", "class", "case",
+
+  "int|", "long|", "double|", "float|", "char|", "unsigned|", "signed|",
+  "void|", NULL
+};
 
 /*** enums ***/
 enum editorKey {
@@ -102,15 +112,7 @@ struct editorSyntax HLDB[] = {
   },
 };
 
-/*** filetypes ***/
-char *C_HL_extensions[] = { ".c", ".h", ".cpp", NULL };
-char *C_HL_keywords[] = {
-  "switch", "if", "while", "for", "break", "continue", "return", "else",
-  "struct", "union", "typedef", "static", "enum", "class", "case",
 
-  "int|", "long|", "double|", "float|", "char|", "unsigned|", "signed|",
-  "void|", NULL
-};
 
 /*** prototypes ***/
 void editorSetStatusMessage(const char *fmt, ...);
