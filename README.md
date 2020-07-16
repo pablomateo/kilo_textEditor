@@ -12,7 +12,7 @@ Keys:
 **CTRL-Q**: Quit  
 **CTRL-F**: Find string in file (ESC to exit search, arrows to navigate)  
 
-Kilo does not depend on any library (not even curses). It uses fairly standard VT100 (and similar terminals) escape sequences. The project is in alpha stage and was written in just a few hours taking code from my other two projects, load81 and linenoise.
+Kilo does not depend on any library (not even curses). It uses fairly standard VT100 (and similar terminals) escape sequences. I created the project to learn a bit more about C Language and Command Line Text Editors. I recommend following the tutorial as it is a greta way to learn all these concepts.
 
 People are encouraged to use it as a starting point to write other editors or command line interfaces that are more advanced than the usual REPL style CLI.
 
